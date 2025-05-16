@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 //let conn= await mongoose.connect("mongodb+srv://binimilton:binimilton@cluster0.fq4ifya.mongodb.net/Fullstack?retryWrites=true&w=majority&appName=Cluster0")
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.use(cors());
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.url}`);
