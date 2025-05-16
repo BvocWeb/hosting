@@ -50,6 +50,12 @@ async function startServer() {
     );
     console.log("✅ Connected to MongoDB");
 
-app.listen(port, () =>{
-    console.log(`Server listenining on port ${port}`)
-})
+    app.listen(port, () => {
+      console.log(`🚀 Server listening on port ${port}`);
+    });
+  } catch (err) {
+    console.error("❌ MongoDB connection failed:", err);
+  }
+}
+
+startServer();
