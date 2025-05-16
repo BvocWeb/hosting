@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-let conn= await mongoose.connect("mongodb+srv://binimilton:binimilton@cluster0.fq4ifya.mongodb.net/Fullstack?retryWrites=true&w=majority&appName=Cluster0")
+//let conn= await mongoose.connect("mongodb+srv://binimilton:binimilton@cluster0.fq4ifya.mongodb.net/Fullstack?retryWrites=true&w=majority&appName=Cluster0")
 const app = express();
 const port = 3000;
 app.use(cors());
@@ -38,6 +38,17 @@ app.post('/api/services', async (req, res) => {
       res.status(200).json({ message: 'Project added successfully' });
 
   });
+async function startServer() {
+  try {
+    await mongoose.connect(
+      "mongodb+srv://binimilton:binimilton@cluster0.fq4ifya.mongodb.net/Fullstack?retryWrites=true&w=majority&appName=Cluster0",
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        tls: true,
+      }
+    );
+    console.log("✅ Connected to MongoDB");
 
 app.listen(port, () =>{
     console.log(`Server listenining on port ${port}`)
