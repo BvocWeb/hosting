@@ -1,53 +1,66 @@
 import mongoose from "mongoose";
-import express, { Router } from "express";
+import express from "express";
 import AddProject from "./project.js";
 import cors from "cors";
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-//let conn= await mongoose.connect("mongodb+srv://binimilton:binimilton@cluster0.fq4ifya.mongodb.net/Fullstack?retryWrites=true&w=majority&appName=Cluster0")
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Middleware
 app.use(cors());
+app.use(express.json());
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.url}`);
   next();
 });
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use(express.json());
-// Get all projects
-app.get('/api/services', async (req, res) => {
-  const projects = await AddProject.find();
-   res.json(projects);
+// Routes
+app.get("/api/services", async (req, res) => {
+  try {
+    const projects = await AddProject.find();
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch projects" });
+  }
 });
 
-// POST route
-app.post('/api/services', async (req, res) => {
+app.post("/api/services", async (req, res) => {
   const { name, status } = req.body;
-  const prjDetails = new AddProject({id: Date.now(), name, status});
 
   if (!name || !status) {
-    return res.status(400).json({ error: 'Name and status are required' });}
-      //const newProject = { id: Date.now(), name, status };
-      await prjDetails.save();
-      res.status(200).json({ message: 'Project added successfully' });
+    return res.status(400).json({ error: "Name and status are required" });
+  }
 
+  const prjDetails = new AddProject({
+    id: Date.now(),
+    name,
+    status,
   });
+
+  try {
+    await prjDetails.save();
+    res.status(200).json({ message: "Project added successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save project" });
+  }
+});
+
+// Connect to MongoDB and start server
 async function startServer() {
   try {
-    await mongoose.connect(
-      "mongodb+srv://binimilton:binimilton@cluster0.fq4ifya.mongodb.net/Fullstack?retryWrites=true&w=majority&appName=Cluster0",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        tls: true,
-      }
-    );
+    const mongoURI = process.env.MONGODB_URI;
+    if (!mongoURI) throw new Error("❌ MONGODB_URI is not defined in environment variables.");
+
+    await mongoose.connect(mongoURI, {
+      tls: true, // Required for Atlas
+    });
+
     console.log("✅ Connected to MongoDB");
 
     app.listen(port, () => {
