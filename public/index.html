@@ -12,10 +12,12 @@
   <ul id="project-list"></ul>
 
   <script>
-    async function loadProjects() {
+   async function loadProjects() {
+    try {
       const res = await fetch('/api/services');
-      const projects = await res.json();
+      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
 
+      const projects = await res.json();
       const list = document.getElementById('project-list');
       list.innerHTML = '';
       projects.forEach(p => {
@@ -23,7 +25,12 @@
         li.textContent = `${p.name} — ${p.status}`;
         list.appendChild(li);
       });
+    } catch (err) {
+      console.error('❌ Error loading projects:', err);
+      alert('Error fetching project list. Check console.');
     }
+  }
+
 
               
     document.getElementById('form1').addEventListener('submit', async function (e) {
